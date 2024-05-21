@@ -1,13 +1,12 @@
 import { useState } from 'react'
-import MyComponent from './page/ShopCart'
+import ShopCart from './page/ShopCart'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
 
-      <MyComponent />
+      <ShopCart />
 
     </>
   )
