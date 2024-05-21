@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CartItem from './CartItems';
-import { openDatabase, getAllItems, openDatabaseOfShipping, clearAll } from '../data/db';
+import { openDatabase, getAllItems, openDatabaseOfShipping, clearAll, addItem } from '../data/db';
 import { addOrder, openDatabaseOfOrder } from '../data/order';
 
 function ShopCart() {
@@ -52,8 +52,7 @@ function ShopCart() {
                 const allItems = await getAllItems(db);
                 setItems(allItems);
                 setTotal(calculateTotal(allItems));
-
-            } catch (error) {
+                } catch (error) {
                 console.error('Failed to fetch items from IndexedDB', error);
             }
         }

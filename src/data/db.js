@@ -33,6 +33,7 @@ export function addItem(db, item) {
         const transaction = db.transaction(["cartItems"], "readwrite");
         const store = transaction.objectStore("cartItems");
         const request = store.add(item);
+
         request.onerror = (event) => {
             reject(`Add item error: ${event.target.errorCode}`);
         };
@@ -102,17 +103,46 @@ export function clearAll() {
     const DBDeleteRequest = window.indexedDB.deleteDatabase("CartDatabase");
 
     DBDeleteRequest.onerror = (event) => {
-      console.error("Error deleting database.");
+        console.error("Error deleting database.");
     };
-    
+
     DBDeleteRequest.onsuccess = (event) => {
-      console.log("Database deleted successfully");
-        };
+        console.log("Database deleted successfully");
+    };
 }
 
 
 
-
+(async function () {
+    const db = await openDatabase();
+    const allItems = await getAllItems(db);
+    console.log(allItems);
+    if (!allItems.length) {
+        await Promise.all([
+            addItem(db, {
+                imgSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/f323fefcb8dc64629100962333618602ce38ca831668e6c56b2102deb366840b?apiKey=7e724f8dbe7341e8950e7325e9acf7be&",
+                title: "Italy Pizza",
+                description: "Extra cheese and topping",
+                quantity: 1,
+                price: 681
+            }),
+            addItem(db, {
+                imgSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/394059da929999217857497ce2624b43920f43637c04a276554354a93d554e85?apiKey=7e724f8dbe7341e8950e7325e9acf7be&",
+                title: "Combo Plate",
+                description: "Extra cheese and topping",
+                quantity: 1,
+                price: 681
+            }),
+            addItem(db, {
+                imgSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/08debe566708b0604069012bb45c4f826d9aeec0abe28eb21d9a7e8177a9ba38?apiKey=7e724f8dbe7341e8950e7325e9acf7be&",
+                title: "Spanish Rice",
+                description: "Extra garlic",
+                quantity: 1,
+                price: 681
+            })
+        ])
+    }
+})()
 
 
 
