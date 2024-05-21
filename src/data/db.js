@@ -161,17 +161,14 @@ export function openDatabaseOfShipping() {
 
         request.onsuccess = (event) => {
             resolve(event.target.result);
-        };
-
-        request.onerror = (event) => {
-            reject(event.target.errorCode);
-        };
-
-        request.onupgradeneeded = (event) => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains('ShippingCost')) {
                 db.createObjectStore('ShippingCost', { keyPath: 'id' });
             }
+        };
+
+        request.onerror = (event) => {
+            reject(event.target.errorCode);
         };
     });
 }
