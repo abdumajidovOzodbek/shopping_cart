@@ -176,8 +176,6 @@ export function openDatabaseOfShipping() {
     });
 }
 
-
-
 function saveShippingCost(cost) {
     const request = indexedDB.open('ShippingDB', 1);
 
@@ -187,10 +185,29 @@ function saveShippingCost(cost) {
         const objectStore = transaction.objectStore('ShippingCost');
         const data = { id: 'fixedShippingCost', cost: cost };
 
-        const putRequest = objectStore.put(data);
-        putRequest.onerror = (event) => {
-            console.error('Error saving shipping cost:', event.target.errorCode);
+        // Check if the shipping cost already exists
+        const getRequest = objectStore.get('fixedShippingCost');
+        getRequest.onsuccess = (getEvent) => {
+            if (getEvent.target.result) {
+                // Update existing entry
+                const putRequest = objectStore.put(data);
+                putRequest.onerror = (putEvent) => {
+                    console.error('Error updating shipping cost:', putEvent.target.errorCode);
+                };
+            } else {
+                // Add new entry
+                const addRequest = objectStore.add(data);
+                addRequest.onerror = (addEvent) => {
+                    console.error('Error saving shipping cost:', addEvent.target.errorCode);
+                };
+            }
         };
+        getRequest.onerror = (getEvent) => {
+            console.error('Error checking shipping cost:', getEvent.target.errorCode);
+        };
+    };
+    request.onerror = (event) => {
+        console.error('Error opening shipping database:', event.target.errorCode);
     };
 }
 
