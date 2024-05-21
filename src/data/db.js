@@ -42,12 +42,11 @@ export function addItem(db, item) {
     });
 }
 export async function deleteItem(id) {
-    const db =await openDatabase()
+    const db = await openDatabase()
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(["cartItems"], "readwrite");
         const store = transaction.objectStore("cartItems");
         const deleteRequest = store.delete(id);
-        console.log(id);
         deleteRequest.onerror = (deleteEvent) => {
             reject(`Delete item error: ${deleteEvent.target.errorCode}`);
         };
@@ -72,10 +71,7 @@ export function updateItem(id, updatedItem) {
                 const data = event.target.result;
                 if (data) {
                     const updatedData = { ...data, ...updatedItem };
-                    console.log(updatedData.quantity);
                     if (updatedData.quantity === 0) {
-                        // If quantity is 0, delete the item from IndexedDB
-
                         const deleteRequest = store.delete(id);
                         deleteRequest.onerror = (deleteEvent) => {
                             reject(`Delete item error: ${deleteEvent.target.errorCode}`);
@@ -84,7 +80,6 @@ export function updateItem(id, updatedItem) {
                             resolve(deleteEvent.target.result);
                         };
                     } else {
-                        // If quantity is not 0, update the item in IndexedDB
                         const updateRequest = store.put(updatedData);
                         updateRequest.onerror = (updateEvent) => {
                             reject(`Update item error: ${updateEvent.target.errorCode}`);
@@ -102,6 +97,33 @@ export function updateItem(id, updatedItem) {
         }
     });
 }
+
+export function clearAll() {
+    const DBDeleteRequest = window.indexedDB.deleteDatabase("CartDatabase");
+
+    DBDeleteRequest.onerror = (event) => {
+      console.error("Error deleting database.");
+    };
+    
+    DBDeleteRequest.onsuccess = (event) => {
+      console.log("Database deleted successfully");
+        };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export function openDatabaseOfShipping() {
     return new Promise((resolve, reject) => {
@@ -142,5 +164,4 @@ function saveShippingCost(cost) {
     };
 }
 
-// Example usage:
 saveShippingCost(4);
