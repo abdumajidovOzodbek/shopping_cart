@@ -124,7 +124,7 @@ function ShopCart() {
                             </div>
                             <div className="flex flex-col flex-1">
                                 <label className="text-sm text-white" htmlFor="cvv">CVV</label>
-                                <input id="cvv" disabled={!items.length} className="px-5 py-3.5 mt-1.5 text-xs bg-indigo-500 rounded-md text-stone-300 max-md:pr-5" type="number" placeholder="123" aria-label="CVV" required />
+                                <input id="cvv" disabled={!items.length} className="flex flex-col justify-center items-start px-5 py-3.5 mt-1.5 text-xs not-italic bg-indigo-500 rounded-md text-stone-300 max-md:pr-5" type="number" placeholder="123" aria-label="CVV" required />
                             </div>
                         </div>
                         <hr className="shrink-0 mt-5 h-px bg-indigo-500 border border-indigo-500 border-solid" />
