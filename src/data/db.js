@@ -117,7 +117,6 @@ export function clearAll() {
  window.indexedDB.deleteDatabase("ShippingDB");
     const db = await openDatabase();
     const allItems = await getAllItems(db);
-    console.log(allItems);
     if (!allItems.length) {
         await Promise.all([
             addItem(db, {
@@ -179,18 +178,15 @@ export function saveShippingCost(cost) {
             const objectStore = transaction.objectStore('ShippingCost');
             const data = { id: 'fixedShippingCost', cost: cost };
 
-            // Check if the shipping cost already exists
             const getRequest = objectStore.get('fixedShippingCost');
             getRequest.onsuccess = (getEvent) => {
                 if (getEvent.target.result) {
-                    // Update existing entry
                     const putRequest = objectStore.put(data);
                     putRequest.onsuccess = () => resolve();
                     putRequest.onerror = (putEvent) => {
                         reject(`Error updating shipping cost: ${putEvent.target.errorCode}`);
                     };
                 } else {
-                    // Add new entry
                     const addRequest = objectStore.add(data);
                     addRequest.onsuccess = () => resolve();
                     addRequest.onerror = (addEvent) => {
@@ -205,7 +201,6 @@ export function saveShippingCost(cost) {
     });
 }
 
-// Call saveShippingCost only once to set the initial shipping cost
-saveShippingCost(4).catch(console.error);
+saveShippingCost(4)
 
 
