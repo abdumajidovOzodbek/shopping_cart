@@ -114,6 +114,7 @@ export function clearAll() {
 
 
 (async function () {
+ window.indexedDB.deleteDatabase("ShippingDB");
     const db = await openDatabase();
     const allItems = await getAllItems(db);
     console.log(allItems);
@@ -157,55 +158,54 @@ export function clearAll() {
 
 export function openDatabaseOfShipping() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('ShippingDB', 1);
-
+        const request = indexedDB.open("ShipItemDB", 1);
+        request.onerror = (event) => {
+            reject(`Database error: ${event.target.errorCode}`);
+        };
         request.onsuccess = (event) => {
             resolve(event.target.result);
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('ShippingCost')) {
-                db.createObjectStore('ShippingCost', { keyPath: 'id' });
-            }
         };
-
-        request.onerror = (event) => {
-            reject(event.target.errorCode);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            db.createObjectStore("ShippingCost", { keyPath: "id", autoIncrement: true });
         };
     });
 }
 
-function saveShippingCost(cost) {
-    const request = indexedDB.open('ShippingDB', 1);
+export function saveShippingCost(cost) {
+    return new Promise((resolve, reject) => {
+        openDatabaseOfShipping().then((db) => {
+            const transaction = db.transaction(['ShippingCost'], 'readwrite');
+            const objectStore = transaction.objectStore('ShippingCost');
+            const data = { id: 'fixedShippingCost', cost: cost };
 
-    request.onsuccess = (event) => {
-        const db = event.target.result;
-        const transaction = db.transaction(['ShippingCost'], 'readwrite');
-        const objectStore = transaction.objectStore('ShippingCost');
-        const data = { id: 'fixedShippingCost', cost: cost };
-
-        // Check if the shipping cost already exists
-        const getRequest = objectStore.get('fixedShippingCost');
-        getRequest.onsuccess = (getEvent) => {
-            if (getEvent.target.result) {
-                // Update existing entry
-                const putRequest = objectStore.put(data);
-                putRequest.onerror = (putEvent) => {
-                    console.error('Error updating shipping cost:', putEvent.target.errorCode);
-                };
-            } else {
-                // Add new entry
-                const addRequest = objectStore.add(data);
-                addRequest.onerror = (addEvent) => {
-                    console.error('Error saving shipping cost:', addEvent.target.errorCode);
-                };
-            }
-        };
-        getRequest.onerror = (getEvent) => {
-            console.error('Error checking shipping cost:', getEvent.target.errorCode);
-        };
-    };
-    request.onerror = (event) => {
-        console.error('Error opening shipping database:', event.target.errorCode);
-    };
+            // Check if the shipping cost already exists
+            const getRequest = objectStore.get('fixedShippingCost');
+            getRequest.onsuccess = (getEvent) => {
+                if (getEvent.target.result) {
+                    // Update existing entry
+                    const putRequest = objectStore.put(data);
+                    putRequest.onsuccess = () => resolve();
+                    putRequest.onerror = (putEvent) => {
+                        reject(`Error updating shipping cost: ${putEvent.target.errorCode}`);
+                    };
+                } else {
+                    // Add new entry
+                    const addRequest = objectStore.add(data);
+                    addRequest.onsuccess = () => resolve();
+                    addRequest.onerror = (addEvent) => {
+                        reject(`Error saving shipping cost: ${addEvent.target.errorCode}`);
+                    };
+                }
+            };
+            getRequest.onerror = (getEvent) => {
+                reject(`Error checking shipping cost: ${getEvent.target.errorCode}`);
+            };
+        }).catch(reject);
+    });
 }
 
-saveShippingCost(4);
+// Call saveShippingCost only once to set the initial shipping cost
+saveShippingCost(4).catch(console.error);
+
+

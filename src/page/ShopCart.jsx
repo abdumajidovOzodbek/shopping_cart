@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CartItem from './CartItems';
-import { openDatabase, getAllItems, openDatabaseOfShipping, clearAll, addItem } from '../data/db';
+import { openDatabase, getAllItems, openDatabaseOfShipping, clearAll } from '../data/db';
 import { addOrder, openDatabaseOfOrder } from '../data/order';
 
 function ShopCart() {
